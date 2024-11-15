@@ -1,0 +1,113 @@
+palindrome string
+
+; This program checks if a given string is a palindrome.
+; A palindrome is a text that reads the same backward as forward.
+; For example: "NAMAN" is a palindrome.
+; Note: This program is case-sensitive, so "Naman" is not the same as "NAMAN".
+
+name "pali"
+org 100h
+
+jmp start
+
+; Define the string and its length
+m1:
+s db 'NAMAN'        ; The string to check
+s_size = $ - m1     ; Calculate the size of the string
+db 0Dh,0Ah,'$'      ; End of string with newline and carriage return for display
+
+start:
+; First, print the string to the console (optional)
+lea di, s           ; Load the address of the string into DI
+mov si, di          ; Copy DI to SI to start comparison
+add si, s_size      ; Move SI to the end of the string
+dec si              ; Point SI to the last character of the string
+mov cx, s_size      ; Load the size of the string into CX
+
+cmp cx, 1
+je is_palindrome    ; If the string has a single character, it’s a palindrome
+
+shr cx, 1           ; Divide CX by 2 (we only need to check half of the string)
+
+next_char:
+    mov al, [di]    ; Load the character at DI
+    mov bl, [si]    ; Load the character at SI
+    cmp al, bl      ; Compare characters
+    jne not_palindrome  ; If characters don’t match, it’s not a palindrome
+    inc di          ; Move DI to the next character (left to right)
+    dec si          ; Move SI to the previous character (right to left)
+loop next_char
+
+is_palindrome:
+    ; Display "This is a palindrome!" message
+    mov ah, 9
+    mov dx, offset msg1
+    int 21h
+    jmp stop
+
+not_palindrome:
+    ; Display "This is not a palindrome!" message
+    mov ah, 9
+    mov dx, offset msg2
+    int 21h
+
+stop:
+    ; Wait for any key press
+    mov ah, 0
+    int 16h
+    ret
+
+msg1 db "  This is a palindrome!$"
+msg2 db "  This is not a palindrome!$"
+
+
+
+rev. string
+
+name "reverse_string"
+org 100h
+
+jmp start
+
+; Data Section
+m1:
+s db 'HELLO'         ; The input string to reverse
+s_size = $ - m1      ; Calculate the size of the string
+db 0Dh, 0Ah, '$'     ; End of the string with newline and '$'
+
+reversed db s_size dup (0) ; Reserve space for the reversed string
+
+; Messages
+msg1 db "The reversed string is: $" ; Message to display before the reversed string
+
+; Code Section
+start:
+    ; Print the original message (optional)
+    mov ah, 9
+    lea dx, msg1
+    int 21h
+
+    ; Load string and prepare pointers
+    lea si, s              ; Load the address of the input string into SI
+    lea di, reversed       ; Load the address of the reversed string into DI
+
+    mov cx, s_size         ; Load the size of the string into CX
+    dec cx                 ; Move CX to index of last character
+
+reverse_loop:
+    mov al, [si + cx]      ; Get the character from the end of the string
+    mov [di], al           ; Store the character in the reversed string
+    inc di                 ; Move DI to the next position in reversed string
+    loop reverse_loop      ; Decrement CX and repeat until CX = 0
+
+    mov byte ptr [di], '$' ; Add the string terminator to the reversed string
+
+    ; Print the reversed string
+    mov ah, 9
+    lea dx, reversed
+    int 21h
+
+    ; Wait for a key press before exiting
+    mov ah, 0
+    int 16h
+    ret

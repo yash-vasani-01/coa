@@ -1,0 +1,79 @@
+name "series_evaluation"
+org 100h
+
+jmp start
+
+; Data Section
+result dw 0           ; Variable to store the final answer (ANS)
+temp dw 0             ; Temporary storage for factorial results
+one dw 1              ; Constant value 1
+
+; Series values as constants
+num1 dw 1             ; 1!
+num2 dw -2            ; -2
+num3 dw 3             ; 3!
+num4 dw -4            ; -4
+num5 dw 5             ; 5!
+num6 dw -6            ; -6
+num7 dw 7             ; 7!
+num8 dw -8            ; -8
+
+; Start of Code
+start:
+    ; Compute and add/subtract each term in the series
+    mov ax, 0              ; Clear AX register
+    mov result, ax         ; Initialize result to 0
+
+    ; Compute 1! and add to result
+    mov cx, 1              ; Set CX = 1 for factorial calculation
+    call factorial         ; Call factorial procedure
+    add result, ax         ; Add 1! to result
+
+    ; Add -2 to result
+    add result, num2
+
+    ; Compute 3! and add to result
+    mov cx, 3              ; Set CX = 3 for factorial calculation
+    call factorial         ; Call factorial procedure
+    add result, ax         ; Add 3! to result
+
+    ; Add -4 to result
+    add result, num4
+
+    ; Compute 5! and add to result
+    mov cx, 5              ; Set CX = 5 for factorial calculation
+    call factorial         ; Call factorial procedure
+    add result, ax         ; Add 5! to result
+
+    ; Add -6 to result
+    add result, num6
+
+    ; Compute 7! and add to result
+    mov cx, 7              ; Set CX = 7 for factorial calculation
+    call factorial         ; Call factorial procedure
+    add result, ax         ; Add 7! to result
+
+    ; Add -8 to result
+    add result, num8
+
+    ; Result is now in 'result' variable (ANS)
+    ; Program ends here. To view result, you could add display code here if needed.
+
+    ; Wait for key press to exit
+    mov ah, 0
+    int 16h
+    ret
+
+; Factorial Procedure
+; This procedure calculates the factorial of a number in CX
+; Result is stored in AX
+factorial:
+    mov ax, one          ; Initialize AX to 1
+    mov bx, cx           ; BX will act as a decrement counter for the loop
+factorial_loop:
+    mul bx               ; Multiply AX by BX
+    dec bx               ; Decrement BX by 1
+    cmp bx, 1            ; Check if BX has reached 1
+    ja factorial_loop    ; If BX > 1, continue loop
+    ret                  ; Return from factorial procedure
+

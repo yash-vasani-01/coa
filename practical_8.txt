@@ -1,0 +1,79 @@
+name "array_sum_even"
+org 100h
+
+jmp start
+
+; Data Section
+array db 10, 15, 22, 8, 13, 6, 30 ; Define an array of numbers
+array_size = $ - array            ; Calculate the size of the array
+sum_even dw 0                     ; Variable to store the sum of even numbers
+
+; Messages
+msg1 db "Sum of even numbers in the array is: $"
+result db 5 dup ('$')             ; Buffer to store the result as string
+
+; Code Section
+start:
+    ; Print the message
+    mov ah, 9
+    lea dx, msg1
+    int 21h
+
+    ; Initialize pointers and variables
+    lea si, array                 ; Load address of the array into SI
+    mov cx, array_size            ; Load the size of the array into CX
+    xor ax, ax                    ; Clear AX for calculations
+    xor bx, bx                    ; Clear BX (used as a temp storage for even sum)
+
+sum_loop:
+    mov al, [si]                  ; Load the current array element into AL
+    test al, 1                    ; Check if the number is even (AL & 1)
+    jnz skip_even                 ; If the result is non-zero, skip this number
+
+    add bx, ax                    ; Add the even number to BX
+
+skip_even:
+    inc si                        ; Move to the next array element
+    loop sum_loop                 ; Decrement CX and repeat if CX > 0
+
+    ; Store the sum in the variable
+    mov sum_even, bx
+
+    ; Convert the sum into a string
+    lea di, result                ; Load the result buffer address
+    call number_to_string         ; Convert BX (sum) to string
+
+    ; Print the result
+    mov ah, 9
+    lea dx, result
+    int 21h
+
+    ; Wait for a key press before exiting
+    mov ah, 0
+    int 16h
+    ret
+
+; Subroutine to Convert Number to String
+number_to_string:
+    xor dx, dx                    ; Clear DX (used for division remainder)
+    mov cx, 0                     ; Initialize CX (digit counter)
+
+convert_loop:
+    xor dx, dx                    ; Clear DX for division
+    div byte ptr [divisor]        ; Divide BX by 10 (result in AL, remainder in AH)
+    add dl, '0'                   ; Convert remainder to ASCII character
+    push dx                       ; Push remainder onto the stack
+    inc cx                        ; Increment digit counter
+    test ax, ax                   ; Check if the quotient is zero
+    jnz convert_loop              ; If not, repeat
+
+write_result:
+    pop ax                        ; Pop characters from the stack
+    mov [di], al                  ; Store characters in result buffer
+    inc di                        ; Move to the next position in buffer
+    loop write_result             ; Repeat for all digits
+
+    mov byte ptr [di], '$'        ; Null-terminate the string
+    ret
+
+divisor db 10                     ; Divisor for converting number to string

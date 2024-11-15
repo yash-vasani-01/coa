@@ -1,0 +1,20 @@
+
+
+
+name "add_numbers"
+org 100h
+
+start:
+    ; Step 1: Define numbers
+    mov al, 25h         ; Load the first number (25h or 37 in decimal) into AL
+    mov bl, 1Ah         ; Load the second number (1Ah or 26 in decimal) into BL
+
+    ; Step 2: Perform addition
+    add al, bl          ; Add AL and BL, result is stored in AL
+
+    ; Step 3: Store result in a specific memory location
+    mov [2000h], al     ; Store the result in memory location 2000h
+
+    ; End program
+    mov ah, 4Ch         ; DOS terminate program function
+    int 21h             ; Interrupt to terminate the program
